@@ -179,8 +179,6 @@ const DrawDendrogram = ({ word }) => {
     return <div></div>;
   }
 
-  console.log(data);
-
   const fontSize = 10;
   const separation = 5;
   const contentWidth = (fontSize + separation) * (data.length / 2);
