@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "homepage": "https://ueno10.github.io/test/",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
