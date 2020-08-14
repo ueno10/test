@@ -12,9 +12,6 @@ const App = () => {
       .fetch(dataPath)
       .then((response) => response.json())
       .then((data) => {
-        data.forEach((item) => {
-          item.wordColor = "black";
-        });
         d3.forceSimulation(data)
           .force(
             "collide",
@@ -66,14 +63,14 @@ const App = () => {
 //////////////////////////
 const WordPlot = ({ data }) => {
   const [word, setWord] = useState("");
-  const [wordColor, setWordColor] = useState("black");
-  const contentWidth = 440;
-  const contentHeight = 440;
+  const [selectedWord, setSelectedWord] = useState("");
+  const contentWidth = 460;
+  const contentHeight = 460;
 
   const margin = {
     left: 150,
     right: 150,
-    top: 10,
+    top: 30,
     bottom: 10,
   };
 
@@ -107,24 +104,22 @@ const WordPlot = ({ data }) => {
                   onClick={() => {
                     setWord(item.word);
                   }}
+                  onMouseEnter={() => {
+                    setSelectedWord(item.word);
+                  }}
+                  onMouseLeave={() => {
+                    setSelectedWord("");
+                  }}
                   transform={`translate(${xScale(item.x)}, ${yScale(item.y)})`}
                   style={{ cursor: "pointer" }}
                 >
                   <title>{`word:${item.word}`}</title>
                   <circle r={cicleSize(item)} fill={color(item.color)} />
                   <text
-                    onMouseEnter={() => {
-                      setWordColor("black");
-                      item.wordColor = wordColor;
-                    }}
-                    onMouseLeave={() => {
-                      setWordColor("blue");
-                      item.wordColor = wordColor;
-                    }}
                     fontSize={`${cicleSize(item) * 0.8}px`}
                     textAnchor="middle"
                     dominantBaseline="central"
-                    fill={item.wordColor}
+                    fill={item.word === selectedWord ? "blue" : "black"}
                   >
                     {item.word}
                   </text>
@@ -152,6 +147,7 @@ const DrawDendrogram = ({ word }) => {
   const [projectData, setProjectData] = useState([]);
   const [projectName, setProjectName] = useState("");
   const [ministries, setMinistries] = useState([]);
+  const [selectedName, setSelectedName] = useState("");
   const dataPath = `./data/dendrogramData2/${word}.json`;
 
   useEffect(() => {
@@ -170,7 +166,7 @@ const DrawDendrogram = ({ word }) => {
       .then((data) => {
         const ministriesSet = new Set();
         data.map((item) => {
-          ministriesSet.add(item["府省庁"]);
+          return ministriesSet.add(item["府省庁"]);
         });
         setMinistries(Array.from(ministriesSet));
 
@@ -284,8 +280,15 @@ const DrawDendrogram = ({ word }) => {
                     transform={`translate(${item.x},${yScale(
                       item.data.data.height
                     )})`}
+                    style={{ cursor: "pointer" }}
                     onClick={() => {
                       setProjectName(item.data.data["事業名"]);
+                    }}
+                    onMouseEnter={() => {
+                      setSelectedName(item.data.data["事業名"]);
+                    }}
+                    onMouseLeave={() => {
+                      setSelectedName("");
                     }}
                   >
                     <circle
@@ -293,12 +296,16 @@ const DrawDendrogram = ({ word }) => {
                       fill={fillColor(item.data.data["府省庁"])}
                     ></circle>
                     <text
-                      style={{ cursor: "pointer" }}
                       transform="translate(-3,10) rotate(45)"
                       y={item.children ? -10 : 2}
                       x="0"
                       fontSize={`${fontSize}px`}
                       textAnchor={item.children ? "end" : "start"}
+                      fill={
+                        item.data.data["事業名"] === selectedName
+                          ? "blue"
+                          : "black"
+                      }
                     >
                       {item.children ? null : item.data.data["事業名"]}
                     </text>
