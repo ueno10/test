@@ -50,8 +50,8 @@ const App = () => {
           <WordPlot data={data} />
         </div>
 
-        <footer class="footer">
-          <div class="content has-text-centered">
+        <footer className="footer">
+          <div className="content has-text-centered">
             <p>&copy; 2020 上野瑞貴 野村理沙</p>
           </div>
         </footer>
@@ -71,7 +71,7 @@ const WordPlot = ({ data }) => {
     left: 150,
     right: 150,
     top: 30,
-    bottom: 10,
+    bottom: 50,
   };
 
   const width = contentWidth + margin.left + margin.right;
@@ -95,6 +95,21 @@ const WordPlot = ({ data }) => {
   return (
     <section className="section">
       <div className="container">
+        <h1 className="title">キーワードバブルチャート</h1>
+        <p>
+          2019年度公開の約5000の行政事業の事業概要からキーワードを抽出し、出現頻度が高い117個のキーワードを対象に事業概要にキーワードが含まれる事業の執行額をキーワード毎に府省庁別で集計、結果を次元削減し二次元空間に表示しています。円の大きさはキーワードの出現頻度で、今回の方法で近い関係にいるキーワードを色分けしています。
+        </p>
+        <p
+          className="has-text-weight-bold"
+          style={{
+            fontSize: "large",
+            marginTop: "0.7rem",
+            marginBottom: "1.0rem",
+          }}
+        >
+          キーワードをクリックするとクリックしたキーワードが事業概要に含まれる事業がページ下部に表示されます。
+        </p>
+
         <svg viewBox={`0 0 ${width} ${height}`}>
           <g transform={`translate(${margin.left}, ${margin.top})`}>
             {data.map((item, i) => {
@@ -127,16 +142,17 @@ const WordPlot = ({ data }) => {
               );
             })}
           </g>
-          <g
-            transform={`translate(${margin.left + contentWidth}, ${
-              contentHeight - 20
-            })`}
-          >
-            <text>{word}</text>
-          </g>
         </svg>
       </div>
-      <div>{word === "" ? null : <DrawDendrogram word={word} />}</div>
+      <div>
+        {word === "" ? (
+          <div>
+            キーワードをクリックするとここにデンドログラムが表示されます
+          </div>
+        ) : (
+          <DrawDendrogram word={word} />
+        )}
+      </div>
     </section>
   );
 };
@@ -194,8 +210,8 @@ const DrawDendrogram = ({ word }) => {
   const margin = {
     left: 160,
     right: 200,
-    top: 20,
-    bottom: 200,
+    top: 75,
+    bottom: 100,
   };
 
   const ministriesList = [];
@@ -213,7 +229,7 @@ const DrawDendrogram = ({ word }) => {
     return color;
   };
 
-  const width = contentWidth + margin.left + margin.right;
+  //const width = contentWidth + margin.left + margin.right;
   const height = contentHeight + margin.top + margin.bottom;
 
   const yScale = d3
@@ -241,83 +257,104 @@ const DrawDendrogram = ({ word }) => {
 
   return (
     <div>
-      <div className="columns">
-        <div className="column is-2">
-          <svg width={margin.left} height="600">
-            {ministriesList.map((item, i) => {
+      <h1 className="title">事業概要に"{word}"を含む事業のデンドログラム</h1>
+      <p>
+        ここでは上のバブルチャートでクリックされたキーワードを事業概要に含む事業の事業概要をベクトル表現したデータを用いて階層クラスター分析を行い、その結果をデンドログラムで表示しており、図の下の方で結合している事業は近い関係にあるといえます。
+      </p>
+      <p
+        className="has-text-weight-bold"
+        style={{
+          fontSize: "large",
+          marginTop: "0.7rem",
+          marginBottom: "2.0rem",
+        }}
+      >
+        デンドログラムの事業名をクリックすると、事業の詳細がページ下部に表示されます。
+      </p>
+      <div style={{ overflowX: "auto" }}>
+        <svg width="1195" height={margin.top}>
+          {ministriesList.map((item, i) => {
+            return (
+              <g
+                transform={`translate(${
+                  i < 7
+                    ? 50 + 160 * i
+                    : i < 14
+                    ? 50 + 160 * (i - 8)
+                    : 50 + 160 * (i - 14)
+                }, ${i < 7 ? 17 : i < 14 ? 34 : 51})`}
+              >
+                <circle r="6" fill={item.color} />
+                <text x="7" y="5">
+                  {item["府省庁"]}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div style={{ overflowX: "scroll" }}>
+        <svg width={contentWidth + margin.right} height={height}>
+          <g transform={`translate(0,0)`}>
+            {testData.slice(1).map((item) => {
               return (
-                <g transform={`translate(6, ${margin.top + 30 * i})`}>
-                  <circle r="6" fill={item.color} />
-                  <text x="7" y="5">
-                    {item["府省庁"]}
+                <path
+                  className="link"
+                  d={`M${item.x},${yScale(item.data.data.height)}
+                        L${item.x},${yScale(item.parent.data.data.height)}
+                        L${item.parent.x},${yScale(
+                    item.parent.data.data.height
+                  )}`}
+                />
+              );
+            })}
+
+            {testData.map((item, i) => {
+              return (
+                <g
+                  key={i}
+                  transform={`translate(${item.x},${yScale(
+                    item.data.data.height
+                  )})`}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    setProjectName(item.data.data["事業名"]);
+                  }}
+                  onMouseEnter={() => {
+                    setSelectedName(item.data.data["事業名"]);
+                  }}
+                  onMouseLeave={() => {
+                    setSelectedName("");
+                  }}
+                >
+                  <circle
+                    r={item.children ? "1" : "6"}
+                    fill={fillColor(item.data.data["府省庁"])}
+                  ></circle>
+                  <text
+                    transform="translate(-3,10) rotate(45)"
+                    y={item.children ? -10 : 2}
+                    x="0"
+                    fontSize={`${fontSize}px`}
+                    textAnchor={item.children ? "end" : "start"}
+                    fill={
+                      item.data.data["事業名"] === selectedName
+                        ? "blue"
+                        : "black"
+                    }
+                  >
+                    {item.children ? null : item.data.data["事業名"]}
                   </text>
                 </g>
               );
             })}
-          </svg>
-        </div>
-
-        <div className="column" style={{ overflowX: "scroll" }}>
-          <svg width={contentWidth + margin.right} height={height}>
-            <g transform={`translate(0,${margin.top})`}>
-              {testData.slice(1).map((item) => {
-                return (
-                  <path
-                    className="link"
-                    d={`M${item.x},${yScale(item.data.data.height)}
-                        L${item.x},${yScale(item.parent.data.data.height)}
-                        L${item.parent.x},${yScale(
-                      item.parent.data.data.height
-                    )}`}
-                  />
-                );
-              })}
-
-              {testData.map((item, i) => {
-                return (
-                  <g
-                    key={i}
-                    transform={`translate(${item.x},${yScale(
-                      item.data.data.height
-                    )})`}
-                    style={{ cursor: "pointer" }}
-                    onClick={() => {
-                      setProjectName(item.data.data["事業名"]);
-                    }}
-                    onMouseEnter={() => {
-                      setSelectedName(item.data.data["事業名"]);
-                    }}
-                    onMouseLeave={() => {
-                      setSelectedName("");
-                    }}
-                  >
-                    <circle
-                      r={item.children ? "1" : "6"}
-                      fill={fillColor(item.data.data["府省庁"])}
-                    ></circle>
-                    <text
-                      transform="translate(-3,10) rotate(45)"
-                      y={item.children ? -10 : 2}
-                      x="0"
-                      fontSize={`${fontSize}px`}
-                      textAnchor={item.children ? "end" : "start"}
-                      fill={
-                        item.data.data["事業名"] === selectedName
-                          ? "blue"
-                          : "black"
-                      }
-                    >
-                      {item.children ? null : item.data.data["事業名"]}
-                    </text>
-                  </g>
-                );
-              })}
-            </g>
-          </svg>
-        </div>
+          </g>
+        </svg>
       </div>
       <div>
-        {projectData.length === 0 ? null : (
+        {projectData.length === 0 ? (
+          <div>事業名をクリックするとここに事業の詳細が表示されます</div>
+        ) : (
           <ProjectTable projectData={projectData} />
         )}
       </div>
