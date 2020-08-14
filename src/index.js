@@ -21,7 +21,7 @@ const App = () => {
             d3
               .forceCollide()
               .radius(function (d) {
-                return Math.pow(d.count, 0.7) + 5;
+                return Math.pow(d.count, 0.7) + 8;
               })
 
               .strength(0.01)
@@ -104,14 +104,6 @@ const WordPlot = ({ data }) => {
               return (
                 <g
                   key={i}
-                  onMouseEnter={() => {
-                    setWordColor("black");
-                    item.wordColor = wordColor;
-                  }}
-                  onMouseLeave={() => {
-                    setWordColor("blue");
-                    item.wordColor = wordColor;
-                  }}
                   onClick={() => {
                     setWord(item.word);
                   }}
@@ -121,6 +113,14 @@ const WordPlot = ({ data }) => {
                   <title>{`word:${item.word}`}</title>
                   <circle r={cicleSize(item)} fill={color(item.color)} />
                   <text
+                    onMouseEnter={() => {
+                      setWordColor("black");
+                      item.wordColor = wordColor;
+                    }}
+                    onMouseLeave={() => {
+                      setWordColor("blue");
+                      item.wordColor = wordColor;
+                    }}
                     fontSize={`${cicleSize(item) * 0.8}px`}
                     textAnchor="middle"
                     dominantBaseline="central"
@@ -131,6 +131,13 @@ const WordPlot = ({ data }) => {
                 </g>
               );
             })}
+          </g>
+          <g
+            transform={`translate(${margin.left + contentWidth}, ${
+              contentHeight - 20
+            })`}
+          >
+            <text>{word}</text>
           </g>
         </svg>
       </div>
