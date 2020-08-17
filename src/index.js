@@ -40,8 +40,8 @@ const App = () => {
         <div className="hero is-info is-bold">
           <div className="hero-body">
             <div className="container">
-              <h1 className="title">情報科学研究 国家財政チーム</h1>
-              <h2 className="subtitle">アイウエオ</h2>
+              <h1 className="title">行政事業可視化</h1>
+              <h2 className="subtitle">情報科学研究 国家財政チーム</h2>
             </div>
           </div>
         </div>
@@ -97,7 +97,7 @@ const WordPlot = ({ data }) => {
       <div className="container">
         <h1 className="title">キーワードバブルチャート</h1>
         <p>
-          2019年度公開の約5000の行政事業の事業概要からキーワードを抽出し、出現頻度が高い117個のキーワードを対象に事業概要にキーワードが含まれる事業の執行額をキーワード毎に府省庁別で集計、結果を次元削減し二次元空間に表示しています。円の大きさはキーワードの出現頻度で、今回の方法で近い関係にいるキーワードを色分けしています。
+          2019年度公開の約5000の行政事業の事業概要からそれぞれキーワードを抽出し、キーワード毎に事業概要にキーワードが含まれている事業の執行額を担当府省庁別で集計をしてデータ作成を行いました。その結果を次元削減し、事業からキーワードを抽出した際に出現頻度の高かった117個のキーワードを二次元空間に表示しています。円の大きさはキーワードの出現頻度で決め、位置の近さで色付けしています。
         </p>
         <p
           className="has-text-weight-bold"
@@ -211,7 +211,7 @@ const DrawDendrogram = ({ word }) => {
     left: 160,
     right: 200,
     top: 75,
-    bottom: 100,
+    bottom: 150,
   };
 
   const ministriesList = [];
@@ -259,7 +259,7 @@ const DrawDendrogram = ({ word }) => {
     <div>
       <h1 className="title">事業概要に"{word}"を含む事業のデンドログラム</h1>
       <p>
-        ここでは上のバブルチャートでクリックされたキーワードを事業概要に含む事業の事業概要をベクトル表現したデータを用いて階層クラスター分析を行い、その結果をデンドログラムで表示しており、図の下の方で結合している事業は近い関係にあるといえます。
+        ここでは上の図でクリックされたキーワードを事業概要に含む事業の事業概要をベクトル表現したデータを用いて階層クラスター分析を行い、その結果をデンドログラムで表示しており、図の下の方で結合している事業は近い関係にあるといえます。
       </p>
       <p
         className="has-text-weight-bold"
@@ -370,6 +370,18 @@ const ProjectTable = ({ projectData }) => {
       <h2 className="has-text-weight-bold">府省庁</h2>
       <p style={{ marginLeft: "0.75rem", marginbottom: "1.0rem" }}>
         {projectData["0"]["府省庁"]}
+      </p>
+      <h2 className="has-text-weight-bold">当初予算(百万円)</h2>
+      <p style={{ marginLeft: "0.75rem", marginbottom: "1.0rem" }}>
+        {projectData["0"]["当初予算"]}
+      </p>
+      <h2 className="has-text-weight-bold">補正予算(百万円)</h2>
+      <p style={{ marginLeft: "0.75rem", marginbottom: "1.0rem" }}>
+        {projectData["0"]["補正予算"]}
+      </p>
+      <h2 className="has-text-weight-bold">執行額(百万円)</h2>
+      <p style={{ marginLeft: "0.75rem", marginbottom: "1.0rem" }}>
+        {projectData["0"]["執行額"]}
       </p>
       <h2 className="has-text-weight-bold">事業の目的</h2>
       <p style={{ marginLeft: "0.75rem", marginbottom: "0.8rem" }}>
