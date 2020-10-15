@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { render } from "react-dom";
 import * as d3 from "d3";
 import "bulma/css/bulma.css";
+import { set } from "d3";
 
 const App = () => {
   const [data, setData] = useState([]);
@@ -164,6 +165,9 @@ const DrawDendrogram = ({ word }) => {
   const [projectName, setProjectName] = useState("");
   const [ministries, setMinistries] = useState([]);
   const [selectedName, setSelectedName] = useState("");
+  const [selectedNode, setSelectedNode] = useState({});
+  const [selectedNodeLeaves, setSelectedNodeLeaves] = useState([]);
+  const [nodeLeavesData, setNodeLeavesData] = useState([]);
   const dataPath = `./data/dendrogramData2/${word}.json`;
 
   useEffect(() => {
@@ -189,10 +193,35 @@ const DrawDendrogram = ({ word }) => {
         const newData = data.filter((item) => {
           return item["公開年度"] === "2019" && item["事業名"] === projectName;
         });
-
         setProjectData(newData);
       });
   }, [projectName]);
+
+  useEffect(() => {
+    window
+      .fetch("./data/tsne_+_clusters_list.json")
+      .then((response) => response.json())
+      .then((data) => {
+        const newNodeLeavesData = [];
+        for (const node of selectedNodeLeaves) {
+          for (const project of data) {
+            if (
+              project["事業名"] === node.data.data["事業名"] &&
+              project["公開年度"] === "2019" &&
+              project["府省庁"] === node.data.data["府省庁"]
+            ) {
+              newNodeLeavesData.push({
+                事業名: project["事業名"],
+                執行額: +project["執行額"],
+                補正予算: project["補正予算"],
+                府省庁: project["府省庁"],
+              });
+            }
+          }
+        }
+        setNodeLeavesData(newNodeLeavesData);
+      });
+  }, [selectedNodeLeaves]);
 
   if (data.length === 0) {
     return <div></div>;
@@ -319,6 +348,12 @@ const DrawDendrogram = ({ word }) => {
                   style={{ cursor: "pointer" }}
                   onClick={() => {
                     setProjectName(item.data.data["事業名"]);
+                    if (item.children !== undefined) {
+                      setSelectedNode(item);
+                      setSelectedNodeLeaves(item.leaves());
+                      //console.log(selectedNode);
+                      //console.log(selectedNodeLeaves);
+                    }
                   }}
                   onMouseEnter={() => {
                     setSelectedName(item.data.data["事業名"]);
@@ -328,7 +363,7 @@ const DrawDendrogram = ({ word }) => {
                   }}
                 >
                   <circle
-                    r={item.children ? "1" : "6"}
+                    r={item.children ? "2" : "6"}
                     fill={fillColor(item.data.data["府省庁"])}
                   ></circle>
                   <text
@@ -350,6 +385,13 @@ const DrawDendrogram = ({ word }) => {
             })}
           </g>
         </svg>
+      </div>
+      <div>
+        {nodeLeavesData.length === 0 ? (
+          <div>ノードをクリックすると下</div>
+        ) : (
+          <DrawHistogram nodeLeavesData={nodeLeavesData} />
+        )}
       </div>
       <div>
         {projectData.length === 0 ? (
@@ -396,6 +438,115 @@ const ProjectTable = ({ projectData }) => {
       >
         {projectData["0"]["事業概要"]}
       </p>
+    </div>
+  );
+};
+
+//////////////////////
+const DrawHistogram = ({ nodeLeavesData }) => {
+  const contentWidth = 300;
+  const contentHeight = 100;
+
+  const margin = {
+    left: 30,
+    right: 50,
+    top: 20,
+    bottom: 50,
+  };
+
+  const width = contentWidth + margin.left + margin.right;
+  const height = contentHeight + margin.top + margin.bottom;
+
+  const projectsMoney = [];
+  for (const node of nodeLeavesData) {
+    projectsMoney.push(node["執行額"]);
+  }
+
+  console.log(projectsMoney);
+
+  const binCol = "blue";
+
+  const xScale = d3
+    .scaleLinear()
+    .domain([0, d3.max(projectsMoney)])
+    .range([0, contentWidth])
+    .nice();
+
+  const histogramData = d3
+    .histogram()
+    .domain(xScale.domain())
+    .thresholds(xScale.ticks(15))(projectsMoney);
+
+  const yScale = d3
+    .scaleLinear()
+    .domain([d3.max(histogramData, (item) => item.length), 0])
+    .range([0, contentHeight])
+    .nice();
+
+  console.log(histogramData);
+
+  return (
+    <div>
+      <svg viewBox={`0 0 ${width} ${height}`}>
+        <g transform={`translate(${margin.left}, ${margin.top})`}>
+          {xScale.ticks().map((x) => {
+            return (
+              <g transform={`translate(${xScale(x)},0)`}>
+                <line
+                  x1="0"
+                  y1={contentHeight}
+                  x2="0"
+                  y2={contentHeight + 2}
+                  stroke="black"
+                />
+                <text y={contentHeight + 8} textAnchor="middle" font-size="5">
+                  {x}
+                </text>
+              </g>
+            );
+          })}
+          {yScale.ticks().map((y) => {
+            return (
+              <g transform={`translate(0,${yScale(y)})`}>
+                {Number.isInteger(y) ? (
+                  <line x1="-2" y1="0" x2="0" y2="0" stroke="black" />
+                ) : null}
+                <line
+                  x1="0"
+                  y1="0"
+                  x2={contentWidth}
+                  y2="0"
+                  stroke="gainsboro"
+                />
+                <text x="-7" y="1" textAnchor="middle" fontSize="5">
+                  {Number.isInteger(y) ? y : null}
+                </text>
+              </g>
+            );
+          })}
+          {histogramData.map((bin, i) => {
+            return (
+              <g
+                key={i}
+                transform={`translate(${xScale(bin.x0)}, ${yScale(
+                  bin.length
+                )})`}
+              >
+                <rect
+                  x="0"
+                  width={
+                    xScale(histogramData[0].x1) -
+                    xScale(histogramData[0].x0) -
+                    1
+                  }
+                  height={contentHeight - yScale(bin.length)}
+                  fill={binCol}
+                />
+              </g>
+            );
+          })}
+        </g>
+      </svg>
     </div>
   );
 };
