@@ -309,7 +309,7 @@ const DrawDendrogram = ({ word }) => {
                   i < 7
                     ? 50 + 160 * i
                     : i < 14
-                    ? 50 + 160 * (i - 8)
+                    ? 50 + 160 * (i - 7)
                     : 50 + 160 * (i - 14)
                 }, ${i < 7 ? 17 : i < 14 ? 34 : 51})`}
               >
@@ -386,19 +386,21 @@ const DrawDendrogram = ({ word }) => {
           </g>
         </svg>
       </div>
-      <div>
-        {nodeLeavesData.length === 0 ? (
-          <div>ノードをクリックすると下</div>
-        ) : (
-          <DrawHistogram nodeLeavesData={nodeLeavesData} />
-        )}
-      </div>
-      <div>
-        {projectData.length === 0 ? (
-          <div>事業名をクリックするとここに事業の詳細が表示されます</div>
-        ) : (
-          <ProjectTable projectData={projectData} />
-        )}
+      <div className="columns">
+        <div className="column is-6">
+          {nodeLeavesData.length === 0 ? (
+            <div>ノードをクリックすると下</div>
+          ) : (
+            <DrawHistogram nodeLeavesData={nodeLeavesData} />
+          )}
+        </div>
+        <div className="column is-4">
+          {projectData.length === 0 ? (
+            <div>事業名をクリックするとここに事業の詳細が表示されます</div>
+          ) : (
+            <ProjectTable projectData={projectData} />
+          )}
+        </div>
       </div>
     </div>
   );
