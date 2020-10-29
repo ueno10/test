@@ -231,10 +231,11 @@ const DrawDendrogram = ({ word }) => {
   const separation = 5;
   const contentWidth = (fontSize + separation) * (data.length / 2);
   const contentHeight = 400;
-  const ministriesCol = d3
-    .scaleLinear()
-    .domain([0, 4, 8, 12, 16, 20])
-    .range(["red", "orange", "yellow", "green", "blue", "purple"]);
+  const ministriesCol = d3.scaleOrdinal(d3.schemeSet3);
+  //const ministriesCol = d3
+  //.scaleLinear()
+  //.domain([0, 4, 8, 12, 16, 20])
+  //.range(["red", "orange", "yellow", "green", "blue", "purple"]);
 
   const margin = {
     left: 160,
