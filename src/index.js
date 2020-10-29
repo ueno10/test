@@ -284,6 +284,11 @@ const DrawDendrogram = ({ word }) => {
 
   const testData = root.descendants();
 
+  const shape = d3.scaleOrdinal(
+    ministriesList.map((d) => d["府省庁"]),
+    d3.symbols.map((s) => d3.symbol().type(s).size(90)())
+  );
+
   return (
     <div>
       <h1 className="title">事業概要に"{word}"を含む事業のデンドログラム</h1>
@@ -313,7 +318,8 @@ const DrawDendrogram = ({ word }) => {
                     : 50 + 160 * (i - 14)
                 }, ${i < 7 ? 17 : i < 14 ? 34 : 51})`}
               >
-                <circle r="6" fill={item.color} />
+                <path d={shape(item["府省庁"])} fill={item.color} />
+                {/*<circle r="6" fill={item.color} />*/}
                 <text x="7" y="5">
                   {item["府省庁"]}
                 </text>
@@ -362,10 +368,21 @@ const DrawDendrogram = ({ word }) => {
                     setSelectedName("");
                   }}
                 >
-                  <circle
+                  {item.children ? (
+                    <circle
+                      r={item.children ? "2" : "6"}
+                      fill={fillColor(item.data.data["府省庁"])}
+                    ></circle>
+                  ) : (
+                    <path
+                      d={shape(item.data.data["府省庁"])}
+                      fill={fillColor(item.data.data["府省庁"])}
+                    />
+                  )}
+                  {/*<circle
                     r={item.children ? "2" : "6"}
                     fill={fillColor(item.data.data["府省庁"])}
-                  ></circle>
+                  ></circle>*/}
                   <text
                     transform="translate(-3,10) rotate(45)"
                     y={item.children ? -10 : 2}
