@@ -482,8 +482,6 @@ const DrawHistogram = ({ nodeLeavesData }) => {
     projectsMoney.push(node["執行額"]);
   }
 
-  console.log(projectsMoney);
-
   const binCol = "blue";
 
   const xScale = d3
@@ -502,8 +500,6 @@ const DrawHistogram = ({ nodeLeavesData }) => {
     .domain([d3.max(histogramData, (item) => item.length), 0])
     .range([0, contentHeight])
     .nice();
-
-  console.log(histogramData);
 
   return (
     <div>
