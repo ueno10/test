@@ -230,7 +230,7 @@ const DrawDendrogram = ({ word }) => {
   const separation = 5;
   const contentWidth = (fontSize + separation) * (data.length / 2);
   const contentHeight = 400;
-  const ministriesCol = d3.scaleOrdinal(d3.schemeSet3);
+  const ministriesCol = d3.scaleOrdinal(d3.schemeCategory10);
   //const ministriesCol = d3
   //.scaleLinear()
   //.domain([0, 4, 8, 12, 16, 20])
@@ -392,7 +392,8 @@ const DrawDendrogram = ({ word }) => {
                     fill={
                       item.data.data["事業名"] === selectedName
                         ? "blue"
-                        : "black"
+                        : item.data.data["事業名"] === projectName ? "brown" : "black"
+                      
                     }
                   >
                     {item.children ? null : item.data.data["事業名"]}
