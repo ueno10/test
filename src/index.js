@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { render } from "react-dom";
 import * as d3 from "d3";
 import "bulma/css/bulma.css";
-import { set } from "d3";
 
 const App = () => {
   const [data, setData] = useState([]);
