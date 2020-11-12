@@ -165,7 +165,7 @@ const DrawDendrogram = ({ word }) => {
   const [ministries, setMinistries] = useState([]);
   const [selectedName, setSelectedName] = useState("");
   const [selectedNode, setSelectedNode] = useState({});
-  const [selectedNodeLeaves, setSelectedNodeLeaves] = useState([]);
+  const [selectNodeLeaves, setSelectNodeLeaves] = useState([]);
   const [nodeLeavesData, setNodeLeavesData] = useState([]);
   const dataPath = `./data/dendrogramData2/${word}.json`;
 
@@ -202,7 +202,7 @@ const DrawDendrogram = ({ word }) => {
       .then((response) => response.json())
       .then((data) => {
         const newNodeLeavesData = [];
-        for (const node of selectedNodeLeaves) {
+        for (const node of selectNodeLeaves) {
           for (const project of data) {
             if (
               project["事業名"] === node.data.data["事業名"] &&
@@ -220,7 +220,7 @@ const DrawDendrogram = ({ word }) => {
         }
         setNodeLeavesData(newNodeLeavesData);
       });
-  }, [selectedNodeLeaves]);
+  }, [selectNodeLeaves]);
 
   if (data.length === 0) {
     return <div></div>;
@@ -353,12 +353,11 @@ const DrawDendrogram = ({ word }) => {
                   )})`}
                   style={{ cursor: "pointer" }}
                   onClick={() => {
-                    setProjectName(item.data.data["事業名"]);
                     if (item.children !== undefined) {
                       setSelectedNode(item);
-                      setSelectedNodeLeaves(item.leaves());
-                      //console.log(selectedNode);
-                      //console.log(selectedNodeLeaves);
+                      setSelectNodeLeaves(item.leaves());
+                    } else {
+                      setProjectName(item.data.data["事業名"]);
                     }
                   }}
                   onMouseEnter={() => {
@@ -370,7 +369,7 @@ const DrawDendrogram = ({ word }) => {
                 >
                   {item.children ? (
                     <circle
-                      r={item.children ? "2" : "6"}
+                      r={item.children ? "3" : "6"}
                       fill={fillColor(item.data.data["府省庁"])}
                     ></circle>
                   ) : (
