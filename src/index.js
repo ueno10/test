@@ -164,7 +164,8 @@ const DrawDendrogram = ({ word }) => {
   const [projectName, setProjectName] = useState("");
   const [ministries, setMinistries] = useState([]);
   const [selectedName, setSelectedName] = useState("");
-  const [selectedNode, setSelectedNode] = useState({});
+  const [selectedNodeName, setSelectedNodeName] = useState("");
+  const [displayedNodeName, setDisplayedNodeName] = useState("");
   const [selectNodeLeaves, setSelectNodeLeaves] = useState([]);
   const [nodeLeavesData, setNodeLeavesData] = useState([]);
   const dataPath = `./data/dendrogramData2/${word}.json`;
@@ -354,23 +355,31 @@ const DrawDendrogram = ({ word }) => {
                   style={{ cursor: "pointer" }}
                   onClick={() => {
                     if (item.children !== undefined) {
-                      setSelectedNode(item);
                       setSelectNodeLeaves(item.leaves());
+                      setDisplayedNodeName(item.data.data.name);
                     } else {
                       setProjectName(item.data.data["事業名"]);
                     }
                   }}
                   onMouseEnter={() => {
+                    if(item.children !== undefined) {
+                      setSelectedNodeName(item.data.data.name)
+                    } 
                     setSelectedName(item.data.data["事業名"]);
                   }}
                   onMouseLeave={() => {
+                    if(item.children !== undefined) {
+                      setSelectedNodeName("")
+                    } 
                     setSelectedName("");
                   }}
                 >
                   {item.children ? (
                     <circle
                       r={item.children ? "3" : "6"}
-                      fill={fillColor(item.data.data["府省庁"])}
+                      fill={selectedNodeName === item.data.data.name 
+                        ? "blue" 
+                        : displayedNodeName === item.data.data.name ? "brown" : "black"}
                     ></circle>
                   ) : (
                     <path
