@@ -5,7 +5,7 @@ import "bulma/css/bulma.css";
 
 const App = () => {
   const [data, setData] = useState([]);
-  const dataPath = "./data/plot_test_data_25.json";
+  const dataPath = "./data/plot_test_data_25_DB_16_3.json";
 
   useEffect(() => {
     window
@@ -18,10 +18,10 @@ const App = () => {
             d3
               .forceCollide()
               .radius(function (d) {
-                return Math.pow(d.count, 0.7) + 8;
+                return Math.pow(d.count, 0.7) + 8.5;
               })
 
-              .strength(0.01)
+              .strength(0.015) // 0.01
               .iterations(30)
           )
           .force("charge", d3.forceManyBody().strength(1))
@@ -65,7 +65,7 @@ const WordPlot = ({ data }) => {
   const [word, setWord] = useState("");
   const [selectedWord, setSelectedWord] = useState("");
   const contentWidth = 460;
-  const contentHeight = 460;
+  const contentHeight = 450;
 
   const margin = {
     left: 150,
@@ -129,9 +129,9 @@ const WordPlot = ({ data }) => {
                   style={{ cursor: "pointer" }}
                 >
                   <title>{`word:${item.word}`}</title>
-                  <circle r={cicleSize(item)} fill={color(item.color)} />
+                  <circle r={cicleSize(item)} fill={item.color === "silver" ? item.color : color(item.color)} />
                   <text
-                    fontSize={`${cicleSize(item) * 0.8}px`}
+                    fontSize={`${cicleSize(item) * 0.77}px`}
                     textAnchor="middle"
                     dominantBaseline="central"
                     fill={item.word === selectedWord ? "blue" : "black"}
@@ -359,6 +359,7 @@ const DrawDendrogram = ({ word }) => {
                       setDisplayedNodeName(item.data.data.name);
                     } else {
                       setProjectName(item.data.data["事業名"]);
+                      console.log(item)
                     }
                   }}
                   onMouseEnter={() => {
@@ -417,7 +418,7 @@ const DrawDendrogram = ({ word }) => {
           {nodeLeavesData.length === 0 ? (
             <div>ノードをクリックすると下</div>
           ) : (
-            <DrawHistogram nodeLeavesData={nodeLeavesData} />
+            <DrawStackedChart nodeLeavesData={nodeLeavesData} />
           )}
         </div>
         <div className="column is-4">
@@ -505,7 +506,8 @@ const DrawHistogram = ({ nodeLeavesData }) => {
 
   const yScale = d3
     .scaleLinear()
-    .domain([d3.max(histogramData, (item) => item.length), 0])
+    .domain([100, 0])
+    //.domain([d3.max(histogramData, (item) => item.length), 0])
     .range([0, contentHeight])
     .nice();
 
@@ -566,6 +568,104 @@ const DrawHistogram = ({ nodeLeavesData }) => {
                   height={contentHeight - yScale(bin.length)}
                   fill={binCol}
                 />
+              </g>
+            );
+          })}
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+const DrawStackedChart = ({ nodeLeavesData }) => {
+  const contentWidth = 200;
+  const contentHeight = 500;
+
+  const margin = {
+    left: 30,
+    right: 50,
+    top: 20,
+    bottom: 50,
+  };
+
+  const width = contentWidth + margin.left + margin.right;
+  const height = contentHeight + margin.top + margin.bottom;
+
+  let total = 0
+
+  const projectsMoneyDigit = [{"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0}];
+  for (const node of nodeLeavesData) {
+    const numDigit = String(Math.floor(node["執行額"])).length
+    projectsMoneyDigit[0][String(numDigit)] += 1
+    total += 1
+  }
+
+  console.log(projectsMoneyDigit)
+
+  const stackChartData = d3.stack()
+          .keys(["1","2","3","4","5","6","7","8"])(projectsMoneyDigit)
+
+  console.log(stackChartData)
+
+  //const stackChartData = stack(projectsMoneyDigit)
+
+  const color = d3.scaleOrdinal(d3.schemeSet1);
+  //const color = (key) => {
+    //return d3.interpolateBlues(key * 1 / 8)
+  //}
+
+
+  //const xScale = d3
+    //.scaleLinear()
+    //.domain([0, d3.max(projectsMoney)])
+    //.range([0, contentWidth])
+    //.nice();
+
+  //const histogramData = d3
+    //.histogram()
+    //.domain(xScale.domain())
+    //.thresholds(xScale.ticks(15))(projectsMoney);
+
+  const yScale = d3
+    .scaleLinear()
+    .domain([100, 0])
+    //.domain([d3.max(histogramData, (item) => item.length), 0])
+    .range([0, contentHeight])
+
+  return (
+    <div>
+      <svg viewBox={`0 0 ${width} ${height}`}>
+        <g transform={`translate(${margin.left}, ${margin.top})`}>
+          {yScale.ticks().map((y) => {
+            return (
+              <g transform={`translate(0,${yScale(y)})`}>
+                {Number.isInteger(y) ? (
+                  <line x1="-2" y1="0" x2="5" y2="0" stroke="black" />
+                ) : null}
+
+                <text x="-7" y="1" textAnchor="middle" fontSize="5">
+                  {Number.isInteger(y) ? y : null}
+                </text>
+              </g>
+            );
+          })}
+          {stackChartData.map((d, i) => {
+            return (
+              <g
+                key={i}
+                transform={`translate(5, ${yScale(100 - ((d[0][0] / total * 100)))})`}
+              >
+                <rect
+                  width="95"
+                  height={yScale(100 - ((d[0][1] - d[0][0]) / total * 100))}
+                  fill={color(d.key)}
+                />
+                {(d[0][1] - d[0][0]) / total * 100 > 1 ? (
+                  <text x="110" y={(yScale(100 - (d[0][1] - d[0][0]) / total * 100 / 2)) + 3} textAnchor="start" fontSize="10">
+                  {`約${Math.floor((d[0][1] - d[0][0]) / total * 100)}%`}
+                </text>
+                ) : null}
+
               </g>
             );
           })}
