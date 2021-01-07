@@ -364,7 +364,6 @@ const DrawDendrogram = ({ word }) => {
                       setDisplayedNodeName(item.data.data.name);
                     } else {
                       setProjectName(item.data.data["事業名"]);
-                      console.log(item);
                     }
                   }}
                   onMouseEnter={() => {
@@ -625,31 +624,13 @@ const DrawStackedChart = ({ nodeLeavesData }) => {
     numberTotal += 1;
   }
 
-  console.log(projectsMoneyDigit);
-
   const stackChartData = d3
     .stack()
     .keys(["1", "2", "3", "4", "5", "6", "7", "8"])(projectsMoneyDigit);
 
-  console.log(stackChartData);
-
   //const stackChartData = stack(projectsMoneyDigit)
 
   const color = d3.scaleOrdinal(d3.schemeSet1);
-  //const color = (key) => {
-  //return d3.interpolateBlues(key * 1 / 8)
-  //}
-
-  //const xScale = d3
-  //.scaleLinear()
-  //.domain([0, d3.max(projectsMoney)])
-  //.range([0, contentWidth])
-  //.nice();
-
-  //const histogramData = d3
-  //.histogram()
-  //.domain(xScale.domain())
-  //.thresholds(xScale.ticks(15))(projectsMoney);
 
   const yScale = d3
     .scaleLinear()
