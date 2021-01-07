@@ -129,7 +129,12 @@ const WordPlot = ({ data }) => {
                   style={{ cursor: "pointer" }}
                 >
                   <title>{`word:${item.word}`}</title>
-                  <circle r={cicleSize(item)} fill={item.color === "silver" ? item.color : color(item.color)} />
+                  <circle
+                    r={cicleSize(item)}
+                    fill={
+                      item.color === "silver" ? item.color : color(item.color)
+                    }
+                  />
                   <text
                     fontSize={`${cicleSize(item) * 0.77}px`}
                     textAnchor="middle"
@@ -359,28 +364,32 @@ const DrawDendrogram = ({ word }) => {
                       setDisplayedNodeName(item.data.data.name);
                     } else {
                       setProjectName(item.data.data["事業名"]);
-                      console.log(item)
+                      console.log(item);
                     }
                   }}
                   onMouseEnter={() => {
-                    if(item.children !== undefined) {
-                      setSelectedNodeName(item.data.data.name)
-                    } 
+                    if (item.children !== undefined) {
+                      setSelectedNodeName(item.data.data.name);
+                    }
                     setSelectedName(item.data.data["事業名"]);
                   }}
                   onMouseLeave={() => {
-                    if(item.children !== undefined) {
-                      setSelectedNodeName("")
-                    } 
+                    if (item.children !== undefined) {
+                      setSelectedNodeName("");
+                    }
                     setSelectedName("");
                   }}
                 >
                   {item.children ? (
                     <circle
                       r={item.children ? "3" : "6"}
-                      fill={selectedNodeName === item.data.data.name 
-                        ? "blue" 
-                        : displayedNodeName === item.data.data.name ? "brown" : "black"}
+                      fill={
+                        selectedNodeName === item.data.data.name
+                          ? "blue"
+                          : displayedNodeName === item.data.data.name
+                          ? "brown"
+                          : "black"
+                      }
                     ></circle>
                   ) : (
                     <path
@@ -401,8 +410,9 @@ const DrawDendrogram = ({ word }) => {
                     fill={
                       item.data.data["事業名"] === selectedName
                         ? "blue"
-                        : item.data.data["事業名"] === projectName ? "brown" : "black"
-                      
+                        : item.data.data["事業名"] === projectName
+                        ? "brown"
+                        : "black"
                     }
                   >
                     {item.children ? null : item.data.data["事業名"]}
@@ -421,7 +431,7 @@ const DrawDendrogram = ({ word }) => {
             <DrawStackedChart nodeLeavesData={nodeLeavesData} />
           )}
         </div>
-        <div className="column is-4">
+        <div className="column is-6">
           {projectData.length === 0 ? (
             <div>事業名をクリックするとここに事業の詳細が表示されます</div>
           ) : (
@@ -583,59 +593,91 @@ const DrawStackedChart = ({ nodeLeavesData }) => {
 
   const margin = {
     left: 30,
-    right: 50,
-    top: 20,
-    bottom: 50,
+    right: 45,
+    top: 60,
+    bottom: 30,
   };
 
   const width = contentWidth + margin.left + margin.right;
   const height = contentHeight + margin.top + margin.bottom;
 
-  let total = 0
+  let numberTotal = 0;
+  let moneyTotal = 0;
 
-  const projectsMoneyDigit = [{"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0}];
+  const labels = [
+    "1~9",
+    "10~99",
+    "100~999",
+    "1,000~9,999",
+    "10,000~99,999",
+    "100,000~999,999",
+    "1,000,000~9,999,999",
+    "10,000,000~99,999,999",
+  ];
+
+  const projectsMoneyDigit = [
+    { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 },
+  ];
   for (const node of nodeLeavesData) {
-    const numDigit = String(Math.floor(node["執行額"])).length
-    projectsMoneyDigit[0][String(numDigit)] += 1
-    total += 1
+    moneyTotal += node["執行額"];
+    const numDigit = String(Math.floor(node["執行額"])).length;
+    projectsMoneyDigit[0][String(numDigit)] += 1;
+    numberTotal += 1;
   }
 
-  console.log(projectsMoneyDigit)
+  console.log(projectsMoneyDigit);
 
-  const stackChartData = d3.stack()
-          .keys(["1","2","3","4","5","6","7","8"])(projectsMoneyDigit)
+  const stackChartData = d3
+    .stack()
+    .keys(["1", "2", "3", "4", "5", "6", "7", "8"])(projectsMoneyDigit);
 
-  console.log(stackChartData)
+  console.log(stackChartData);
 
   //const stackChartData = stack(projectsMoneyDigit)
 
   const color = d3.scaleOrdinal(d3.schemeSet1);
   //const color = (key) => {
-    //return d3.interpolateBlues(key * 1 / 8)
+  //return d3.interpolateBlues(key * 1 / 8)
   //}
 
-
   //const xScale = d3
-    //.scaleLinear()
-    //.domain([0, d3.max(projectsMoney)])
-    //.range([0, contentWidth])
-    //.nice();
+  //.scaleLinear()
+  //.domain([0, d3.max(projectsMoney)])
+  //.range([0, contentWidth])
+  //.nice();
 
   //const histogramData = d3
-    //.histogram()
-    //.domain(xScale.domain())
-    //.thresholds(xScale.ticks(15))(projectsMoney);
+  //.histogram()
+  //.domain(xScale.domain())
+  //.thresholds(xScale.ticks(15))(projectsMoney);
 
   const yScale = d3
     .scaleLinear()
     .domain([100, 0])
     //.domain([d3.max(histogramData, (item) => item.length), 0])
-    .range([0, contentHeight])
+    .range([0, contentHeight]);
 
   return (
     <div>
+      <h1 className="title">
+        クリックされたノードまでに属する事業の執行額データ
+      </h1>
+      <p>
+        ここでは上の図でクリックされたノードまでに属す事業の執行額に関するデータを可視化しています。
+      </p>
+      <p>
+        下の帯グラフではクリックされたノードまでに含まれる全事業の執行額の桁数の割合を表しています。この図を見る事で、クリックしたノードまでに含まれる事業はどれぐらいの規模の事業が多いのかや、どれぐらいお金が使われているのかを知る事ができます。
+      </p>
+
       <svg viewBox={`0 0 ${width} ${height}`}>
         <g transform={`translate(${margin.left}, ${margin.top})`}>
+          <text x="-9" y="-6" textAnchor="middle" fontSize="7">
+            (%)
+          </text>
+          <text x="-30" y="-25" textAnchor="start" fontSize="10">
+            {`執行額合計:${moneyTotal}(百万円)`}
+          </text>
+
           {yScale.ticks().map((y) => {
             return (
               <g transform={`translate(0,${yScale(y)})`}>
@@ -643,7 +685,7 @@ const DrawStackedChart = ({ nodeLeavesData }) => {
                   <line x1="-2" y1="0" x2="5" y2="0" stroke="black" />
                 ) : null}
 
-                <text x="-7" y="1" textAnchor="middle" fontSize="5">
+                <text x="-9" y="2" textAnchor="middle" fontSize="7">
                   {Number.isInteger(y) ? y : null}
                 </text>
               </g>
@@ -653,19 +695,45 @@ const DrawStackedChart = ({ nodeLeavesData }) => {
             return (
               <g
                 key={i}
-                transform={`translate(5, ${yScale(100 - ((d[0][0] / total * 100)))})`}
+                transform={`translate(5, ${yScale(
+                  100 - (d[0][0] / numberTotal) * 100
+                )})`}
               >
                 <rect
                   width="95"
-                  height={yScale(100 - ((d[0][1] - d[0][0]) / total * 100))}
+                  height={yScale(
+                    100 - ((d[0][1] - d[0][0]) / numberTotal) * 100
+                  )}
                   fill={color(d.key)}
                 />
-                {(d[0][1] - d[0][0]) / total * 100 > 1 ? (
-                  <text x="110" y={(yScale(100 - (d[0][1] - d[0][0]) / total * 100 / 2)) + 3} textAnchor="start" fontSize="10">
-                  {`約${Math.floor((d[0][1] - d[0][0]) / total * 100)}%`}
-                </text>
+                {((d[0][1] - d[0][0]) / numberTotal) * 100 > 4 ? (
+                  <g>
+                    <text
+                      x="105"
+                      y={
+                        yScale(
+                          100 - (((d[0][1] - d[0][0]) / numberTotal) * 100) / 2
+                        ) + 4
+                      }
+                      textAnchor="start"
+                      fontSize="10"
+                    >
+                      {`約${Math.floor(
+                        ((d[0][1] - d[0][0]) / numberTotal) * 100
+                      )}%`}
+                    </text>
+                    <text
+                      x="47"
+                      y={yScale(
+                        100 - (((d[0][1] - d[0][0]) / numberTotal) * 100) / 2
+                      )}
+                      textAnchor="middle"
+                      fontSize="8"
+                    >
+                      {`${labels[i]}`}
+                    </text>
+                  </g>
                 ) : null}
-
               </g>
             );
           })}
