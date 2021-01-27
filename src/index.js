@@ -40,7 +40,9 @@ const App = () => {
         <div className="hero is-info is-bold">
           <div className="hero-body">
             <div className="container">
-              <h1 className="title">行政事業可視化</h1>
+              <h1 className="title">
+                類似事業探索の為の行政事業の俯瞰的可視化
+              </h1>
               <h2 className="subtitle">情報科学研究 国家財政チーム</h2>
             </div>
           </div>
@@ -52,7 +54,7 @@ const App = () => {
 
         <footer className="footer">
           <div className="content has-text-centered">
-            <p>&copy; 2020 上野瑞貴 野村理沙</p>
+            <p>&copy; 2020 上野瑞貴 野村理紗</p>
           </div>
         </footer>
       </div>
@@ -297,9 +299,9 @@ const DrawDendrogram = ({ word }) => {
 
   return (
     <div>
-      <h1 className="title">事業概要に"{word}"を含む事業のデンドログラム</h1>
+      <h1 className="title">事業概要に"{word}"を含む行政事業デンドログラム</h1>
       <p>
-        ここでは上の図でクリックされたキーワードを事業概要に含む事業の事業概要をベクトル表現したデータを用いて階層クラスター分析を行い、その結果をデンドログラムで表示しており、図の下の方で結合している事業は近い関係にあるといえます。
+        ここではキーワードバブルチャートでクリックされたキーワードを事業概要に含む事業の事業概要をベクトル表現したデータを用いて階層クラスター分析を行い、その結果をデンドログラムで描画しています。図の下の方で結合している事業は近い関係にあるといえます。またある程度の高さでクラスタを見る事で事業をいくつかの事業群として見る事が可能です。
       </p>
       <p
         className="has-text-weight-bold"
