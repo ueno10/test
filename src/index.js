@@ -99,7 +99,7 @@ const WordPlot = ({ data }) => {
       <div className="container">
         <h1 className="title">キーワードバブルチャート</h1>
         <p>
-          2019年度公開の約5000の行政事業の事業概要からそれぞれキーワードを抽出し、キーワード毎に事業概要にキーワードが含まれている事業の執行額を担当府省庁別で集計をしてデータ作成を行いました。その結果を次元削減し、事業からキーワードを抽出した際に出現頻度の高かった117個のキーワードを二次元空間に表示しています。円の大きさはキーワードの出現頻度で決め、位置の近さで色付けしています。
+          2019年度公開の約5000の行政事業の事業概要からそれぞれキーワードを抽出し、キーワード毎に事業概要にキーワードが含まれている事業の執行額を担当府省庁別で集計をしてデータ作成を行いました。その結果を次元削減し、事業からキーワードを抽出した際に出現頻度の高かった117個のキーワードを二次元空間に表示しています。円の大きさはキーワードの出現頻度で決め、クラスター分析を行い、近いキーワードを同じ色で色付けしています。キーワードバブルチャートを見る事でどのようなカテゴリに対して事業が行われているのかを大まかに俯瞰することが可能となります。
         </p>
         <p
           className="has-text-weight-bold"
@@ -308,10 +308,20 @@ const DrawDendrogram = ({ word }) => {
         style={{
           fontSize: "large",
           marginTop: "0.7rem",
-          marginBottom: "2.0rem",
+          marginBottom: "1.0rem",
         }}
       >
         デンドログラムの事業名をクリックすると、事業の詳細がページ下部に表示されます。
+      </p>
+      <p
+        className="has-text-weight-bold"
+        style={{
+          fontSize: "large",
+          marginTop: "0.7rem",
+          marginBottom: "2.0rem",
+        }}
+      >
+        デンドログラムのクラスタとクラスタが結合する部分をクリックすると、そこまでのクラスタに含まれる事業に関する執行額のデータがページ下部に表示されます。
       </p>
       <div style={{ overflowX: "auto" }}>
         <svg width="1195" height={margin.top}>
@@ -427,7 +437,9 @@ const DrawDendrogram = ({ word }) => {
       <div className="columns">
         <div className="column is-6">
           {nodeLeavesData.length === 0 ? (
-            <div>ノードをクリックすると下</div>
+            <div>
+              行政事業デンドログラムのノードをクリックするとクラスタに属する事業の執行額データをここに表示します
+            </div>
           ) : (
             <DrawStackedChart nodeLeavesData={nodeLeavesData} />
           )}
