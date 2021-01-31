@@ -670,7 +670,7 @@ const DrawStackedChart = ({ nodeLeavesData }) => {
             (%)
           </text>
           <text x="-30" y="-25" textAnchor="start" fontSize="10">
-            {`執行額合計:${moneyTotal}(百万円)`}
+            {`執行額合計:${Math.round(moneyTotal)}(百万円)`}
           </text>
 
           {yScale.ticks().map((y) => {
